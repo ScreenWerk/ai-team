@@ -1,0 +1,6 @@
+[submodule "legacy"]
+	path = legacy
+	url = https://github.com/ScreenWerk/Screenwerk-2018.git
+[submodule "player"]
+	path = player
+	url = https://github.com/ScreenWerk/2026.git
