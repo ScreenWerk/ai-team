@@ -75,6 +75,22 @@ sw_playlist_media → media.reference → sw_media
 
 8. **Missing from ScreenConfig but present in Entu:** `sw_playlist.valid_from/valid_to` — playlists have validity windows in Entu but ScreenConfig doesn't expose them at playlist level (only at LayoutPlaylist and PlaylistMedia level).
 
+### Issue #2: schedule.duration unit (2026-04-08)
+
+**RESOLVED:** Entu stores `sw_schedule.duration` in **seconds**. Evidence: values like 900 (15 min), 3600 (1 hour). Legacy player correctly uses `* 1e3`. New player incorrectly uses `* 60_000` (treats as minutes). Bug in `useScheduler.ts:43`, `types.ts:23` comment, `schedule.vue:33` label.
+
+### Tomas Investigation: deleted content still showing (2026-04-08)
+
+**KEY FINDING:** Publisher sources `validFrom`/`validTo` from `sw_media`, NOT `sw_playlist_media`.
+
+Evidence: CDN JSON validity dates match `sw_media.valid_from/valid_to` exactly, differ from `sw_playlist_media.valid_from/valid_to`. Example: `sok edita` (ord 38) has playlist_media validTo=Apr 19 but CDN uses media validTo=May 12.
+
+**Impact:** CMS users editing validity on `sw_playlist_media` have no effect on player display. Publisher ignores those dates.
+
+**Status:** No deleted-but-present items detected in current snapshot (12 items match between Entu and CDN). CDN was re-published today. Need PO to clarify with Tomas what "deleted" means in his workflow.
+
+**Note:** `bilietai` account returns 404 on Entu API — all Bilietai entities live under `piletilevi` account.
+
 ### Questions to Investigate
 
 - Q1: What triggers `published.datetime` to update on `sw_screen_group`? Is it a manual CMS action or automatic?
@@ -82,5 +98,6 @@ sw_playlist_media → media.reference → sw_media
 - Q3: How does `add_from` work in Entu entity definitions? Not seen in current code.
 - Q4: Are there Entu properties on these entity types beyond what the dashboard fetches?
 - Q5: Is `sw_playlist.valid_from/valid_to` intentionally excluded from ScreenConfig, or is it a gap?
+- Q6: Should the new pipeline use `sw_playlist_media.validFrom/To` or `sw_media.validFrom/To` or the more restrictive of both?
 
 (*SW:Talbot*)

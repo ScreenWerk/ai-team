@@ -93,7 +93,7 @@ precacheBatchSize                 = 3
 
 ## Gaps / Questions
 
-1. **`usePrecache.ts` doesn't exist** — precache call is in `useScreenConfig`, no dedicated composable. My role description mentions it. Either it's inlined or not yet extracted.
+1. **`usePrecache.ts` exists** — confirmed at `app/composables/usePrecache.ts` (missed in initial exploration; was reformatted in Phase 2).
 2. **No `player/tests/` dir** — Plateau needs to scaffold Vitest before TDD can begin
 3. **`mediaEid` field in `PlaylistMedia`** — referenced in types but not used in rendering; just telemetry?
 4. **`layoutEid` in `Schedule`** — also in types but not used at runtime (denormalized into `layoutPlaylists`)
