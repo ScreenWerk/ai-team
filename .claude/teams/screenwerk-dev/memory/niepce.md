@@ -1,6 +1,6 @@
 # Niepce — Scratchpad
 
-(*SW:Niepce*) — last updated 2026-04-07
+(*SW:Niepce*) — last updated 2026-04-08
 
 ---
 
@@ -186,11 +186,32 @@ The `fileDO→file` normalization in `useScreenConfig.ts` is currently done on t
 
 ---
 
+## Session Log
+
+### 2026-04-07
+- Spawned fresh; no prior scratchpad
+- Read: common-prompt, role prompt, player README
+- Received + acknowledged team rules from team-lead:
+  - No work without GitHub issue
+  - Every issue must have explicit TDD role assignment (RED/GREEN)
+  - Full chain mandatory: Issue → Branch → TDD → PR → Merge
+- Explored `player/scripts/` — does not exist (pipeline greenfield)
+- Explored `player/app/types.ts` — ScreenConfig contract fully understood
+- Explored legacy sync/render scripts — key diffs noted (see tables above)
+- Reported findings to team-lead
+
+### 2026-04-08
+- No new work — pausing session
+- State saved; open questions outstanding (Q1–Q6 above)
+
+---
+
 ## Status
 
 - [x] Read common-prompt, role prompt, player README
+- [x] Team rules acknowledged (issue + TDD roles + full chain mandatory)
 - [x] Explored `player/scripts/` — does not exist
 - [x] Explored `player/app/types.ts` — fully understood
 - [x] Explored legacy sync/render scripts — key diffs noted
-- [ ] Vitest setup (prerequisite — needs Daguerre)
+- [ ] Vitest setup (prerequisite — needs GitHub issue + Daguerre)
 - [ ] First RED test (awaiting GitHub issue + branch)

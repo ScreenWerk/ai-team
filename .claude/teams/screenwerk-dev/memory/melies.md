@@ -144,19 +144,54 @@ player/app/
 
 ---
 
-## Open Questions
+## Session: 2026-04-08 — Issue #2 Work
 
-1. What does `SCREEN_KEY` do in legacy? (In `globals.js` it's stored but I don't see it used in sync/render — may be auth header?)
-2. Are VBS launcher scripts somewhere in the repo? (Not in `legacy/local/`, only `screen.yml` present)
-3. What is `logging.js`? (Not yet read)
-4. New player URL media component — where is it? (Need to find in `player/app/components/`)
-5. Does the CDN JSON currently publish `duration` in seconds or minutes?
+### Issue ScreenWerk/2026#2 — Confirm legacy duration interpretation
+
+**Status: COMPLETE — reported to team-lead**
+
+Task: confirm legacy codebase treats `schedule.duration` as seconds.
+
+**Findings (all from `renderDom.js`):**
+
+| Line | Code | Meaning |
+|---|---|---|
+| 128 | `self.swSchedule.duration * 1e3 < ms_from_latest_playback` | Stop if duration (s→ms) already exceeded |
+| 137 | `self.swSchedule.duration * 1e3 < (ms_from_latest_playback + ms_until_next_playback)` | Need to schedule stop timeout |
+| 138 | `self.swSchedule.duration * 1e3 - ms_from_latest_playback` | Compute remaining ms |
+| 294 | `self.swMedia.duration * 1e3` | Media-level duration also seconds |
+
+**Conclusion delivered to team-lead:**
+- Legacy: `schedule.duration` = **seconds**
+- New player `useScheduler.ts:39`: `duration * 60_000` = **minutes** → breaking unit mismatch
+- Entu source values (30, 900, 3600) are seconds — confirmed by Talbot
+- Fix decision delegated to Daguerre + Reynaud + Talbot (pipeline convert vs player revert)
+- `media.duration` unit is **consistent** — seconds in both legacy and new `types.ts`
 
 ---
 
-## Next Step
+## Team Rules (as of 2026-04-08)
 
-When a GitHub issue is assigned:
-- Write `docs/migration/checklist.md` (master tracking)
-- Write individual domain analysis files
-- Feed gap descriptions to Plateau and Niepce as test case inputs
+1. No task without a GitHub issue
+2. No issue without TDD role assignments (RED = who, GREEN = who)
+3. Full chain: Issue → Branch → TDD → PR → Merge
+4. No direct commits to `main`
+
+---
+
+## Open Questions
+
+1. What does `SCREEN_KEY` do in legacy? (stored in globals.js but not seen used in sync/render — may be auth header?)
+2. Are VBS launcher scripts somewhere in the repo? (`legacy/local/` only has `screen.yml`)
+3. What is `logging.js`? (not yet read — low priority)
+4. New player URL media component — where is it? (need `player/app/components/`)
+5. Does the CDN JSON currently publish `schedule.duration` in seconds or minutes? (pending pipeline team decision from issue #2)
+
+---
+
+## Next Steps (awaiting GitHub issues)
+
+- Write `docs/migration/checklist.md` (master tracking document)
+- Write individual domain analysis files (`config-fetching.md`, `media-handling.md`, `playback.md`, `offline.md`, `electron-specific.md`)
+- Feed `cleanup` flag gap description to Plateau as test case input (once issue created)
+- Feed URL media reload gap to Plateau once confirmed

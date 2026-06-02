@@ -100,3 +100,30 @@ The player currently normalizes `fileDO` → `file` on load. This suggests the C
 - **No test infrastructure** — `player/tests/` doesn't exist, `player/scripts/tests/` doesn't exist. Niepce and I need to set up the test framework.
 - **No `vitest` or test runner** in `package.json` devDependencies
 - **Pipeline output target:** CDN at `{CDN}/screen/{screenId}.json` — need to understand the upload mechanism (S3? SCP? API?)
+
+## Session Status (2026-04-08)
+
+### Work Done
+- Explored full codebase relevant to pipeline role
+- Mapped ScreenConfig contract, all 9 Entu entity types and their properties
+- Mapped full reference resolution chain (screen → screen_group → config → schedules → layouts → playlists → medias)
+- Documented legacy system's approach (`swpublisher.entu.eu`, `sync.js`)
+- Identified that `player/scripts/` is greenfield — no pipeline code exists yet
+
+### Issues Worked On
+- None — no GitHub issues assigned yet
+
+### Team Rules Acknowledged
+1. No work without a GitHub issue
+2. No issue without TDD role assignment (RED/GREEN)
+3. Full workflow: Issue → Branch → TDD → PR → Merge (no direct commits to main)
+
+### Open Questions (unanswered — need Talbot)
+1. `fileDO` vs `file` semantics in Entu API responses
+2. Auth requirements for Entu API in publish pipeline context
+3. CDN upload mechanism for `files.screenwerk.ee`
+
+### Next Steps (when resuming)
+- Wait for GitHub issue assignment from team-lead
+- Coordinate with Niepce on test infrastructure setup (vitest, test dirs)
+- Ask Talbot the open questions above once he's available
