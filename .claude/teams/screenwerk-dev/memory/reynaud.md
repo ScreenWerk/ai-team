@@ -1,6 +1,14 @@
 # Reynaud — Player Builder Scratchpad
 
-_Last updated: 2026-04-08_
+_Last updated: 2026-06-18_
+
+## Session 2026-06-18
+
+### #2 — Duration unit: CONFIRMED FIXED, closed (PR #10 merged)
+Re-verified from scratch this session. `useScheduler.ts:43` = `s.duration * 1_000` (seconds→ms), no `*60_000` anywhere. All duration/delay sites consistent: `useMediaTimer.ts:36` media duration `*1000`, `useMediaTimer.ts:49` + `useMediaPlayback.ts:41` delay `*1000`, `types.ts:23/55` documented Seconds, dashboard renders `s`. Plateau's `tests/unit/scheduler.test.ts` correctly captures seconds semantics (TICK+35s→null assertion would fail under old buggy code). Tests 8/8, lint clean. No code change from me — confirm-only task.
+
+### #9 — PARKED for next session (player-side validFrom)
+Next task: future-`validFrom` media must NOT display before its start at the render/poll layer. Plateau will have a RED test. I write GREEN. Check `usePlaylist.ts` (PlaylistMedia validity filter), `useScreen.ts` validLayoutPlaylists, and `utils/date.ts isWithinValidityWindow()` — already exists per overview, so #9 may be confirming/extending render-layer enforcement rather than net-new filter logic. Start by reading Plateau's test.
 
 ---
 
