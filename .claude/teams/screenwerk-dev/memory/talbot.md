@@ -1,4 +1,66 @@
-# Talbot Scratchpad — updated 2026-06-02
+# Talbot Scratchpad — updated 2026-06-18
+
+## SESSION CLOSE 2026-06-18 (Issue #9 parked on Tomas, back 2026-06-23)
+Issue #9 investigated to ground truth. Net: banner sw_media 6a2bfaad4cd971291c5d53c2 is correctly future-dated (valid_from 2026-06-15T07:00:48Z = 10:00 EEST), is NOW orphaned (no playlist-media anywhere; existed at CMS capture 06-12 15:48, gone by 06-18), and is ABSENT from BOTH publisher endpoints (.eu swpublisher + .ee CDN are byte-identical, md5 c4a263bfa30d1e897db76fc195b3f9b0, only published version 06-12 12:56). No demonstrated pipeline/player bug. Chain: media -> (orphan) -> playlist 64f7f3034ecca5c17a5980d3 -> lp 64f7f35d... -> layout 64f7f220... -> schedule 64f7f25a... -> config 64f7f117... -> S/G 64f7f018... -> screen 64f7f3f04ecca5c17a5980d6 (BLT_Jaunimo_teatras, the only screen). Remaining unknowns are device-side + Tomas's exact observation (live vs CMS preview) — PO question owned by Mihkel, Tomas back 2026-06-23.
+
+## 2026-06-18 Issue #9 — DISCOVERY/MAPPING (Bilietai future-dated banner shown early)
+
+Task: map entity chain for banner `blt_vjt_naujas sezonas 09 01`, read-only, NO hypothesis. Account = `piletilevi`. API host = `https://api.entu.app/piletilevi/...`. CDN = `https://files.screenwerk.ee/screen/{screenEid}.json`.
+
+ENTITY CHAIN (real eids, all from raw api.entu.app):
+- sw_media (banner)      = `6a2bfaad4cd971291c5d53c2`
+  - name = "blt_vjt_naujas sezonas 09 01"; type = Image; file = "EKRANAI 1920x10802.jpg" (75519 B, image/jpeg)
+  - valid_from = `2026-06-15T07:00:48.000Z` (= 10:00 EEST, matches CMS 2026-06-15 10:00)
+  - valid_to   = `2026-09-01T12:26:11.000Z`
+  - _created   = `2026-06-12T12:25:16.997Z` by Tomas Petryla (61bc4cd84ecca5c17a5976c7)
+  - _parent    = customer "Bilietu Pasaulis" (5541c8164ecca5c17a5992ce)
+- sw_playlist_media      = **NONE**. Global scan of all 158 playlist_media: ZERO reference this media. None created 2026-06-11/12/13. Banner is ORPHANED (no playlist link). _reference backlinks on media = only its own `type` ref.
+
+Likely-intended playlist (by `blt_vjt_` prefix = Vilniaus Jaunimo Teatras), traced upward independently:
+- sw_playlist           = `64f7f3034ecca5c17a5980d3` (LT Jaunimo teatras playlist); currently 2 pm only (laukine antis, delfi), valid_from/to = null
+- sw_layout_playlist    = `64f7f35d4ecca5c17a5980d5` (LT Jaunimo teatras Layout-Playlist)
+- sw_layout             = `64f7f2204ecca5c17a5980d1` (LT Jaunimo teatras Layout)
+- sw_schedule           = `64f7f25a4ecca5c17a5980d2` crontab `0 * * * *`
+- sw_configuration      = `64f7f1174ecca5c17a5980cf` (LT Jaunimo teatras CONF)
+- sw_screen_group       = `64f7f0184ecca5c17a5980ce` (LT Jaunimo teatras); published.datetime = `2026-06-12T12:56:09.015Z`; ispublished=false
+- sw_screen             = `64f7f3f04ecca5c17a5980d6` (BLT_Jaunimo_teatras) — ONLY screen in group
+
+CDN JSON `https://files.screenwerk.ee/screen/64f7f3f04ecca5c17a5980d6.json`:
+- publishedAt = 2026-06-12T12:56:09.015Z (matches S/G), last-modified 12 Jun 12:56 GMT, max-age=60
+- schedules[0].layoutPlaylists[0].playlistMedias = ONLY 2: laukine antis (69f9ddf1...) + delfi (69ce6e78...). Banner NOT present.
+
+KEY DISCOVERY FACTS (not root cause):
+- F1: banner sw_media exists, valid_from correctly 2026-06-15 10:00 EEST.
+- F2: NO playlist_media references the banner anywhere in account (current state).
+- F3: banner does NOT appear in the CDN JSON the player received (12 Jun publish).
+
+UNKNOWNS for root-cause phase:
+- U1: Was a playlist_media for the banner ever created, then deleted? (Entu has no audit log via API I can see; check property history if available.)
+- U2: If banner was never linked, how did Tomas observe it "displaying"? Possible: he saw a CMS preview, not the live player; or a different screen/playlist; or a cached/old player state.
+- U3: Did the early display predate this CDN publish? Report ~06-12; media created 06-12 12:25; publish 06-12 12:56. Need Tomas's exact observation time + which screen/device.
+- U4: Confirm Bilietai has only this one VJT screen, or whether banner was meant for a different/multiple screens.
+
+## 2026-06-18 Issue #9 — .EU PUBLISHER CHECK (host the installed Electron player consumes)
+Legacy Electron player fetches from `https://swpublisher.entu.eu/screen/{eid}.json` (globals.js:212, sync.js:22 -> `_G.SCREENWERK_API + _G.SCREEN_EID + '.json'`). NOT the .ee CDN.
+Fetched https://swpublisher.entu.eu/screen/64f7f3f04ecca5c17a5980d6.json (200):
+- publishedAt 2026-06-12T12:56:09.015Z; last-modified Fri 12 Jun 2026 12:56:46 GMT; etag c4a263bfa30d1e897db76fc195b3f9b0; max-age=60.
+- playlistMedias = SAME 2 only (laukine antis 69f9ddf1..., delfi 69ce6e78...). Banner blt_vjt_naujas sezonas NOT present.
+- BYTE-IDENTICAL to .ee CDN: both md5 = c4a263bfa30d1e897db76fc195b3f9b0, diff empty, same last-modified/etag. => .eu and .ee serve the exact same file; the banner is on NEITHER host.
+FACT: the endpoint the actual box fetches (.eu) did not carry the banner as of the 06-12 12:56 publish (the only published version I can read on either host).
+
+## 2026-06-18 Issue #9 — RECONCILIATION with CMS screenshot
+Team-lead supplied verbatim CMS state (captured 2026-06-12 15:48 LT) for the playlist-media:
+- Title/Media blt_vjt_naujas sezonas 09 01; Ordinal 1; Duration 8s; Valid From 06/15/2026 10:00 AM; Valid To 09/01/2026 03:27 PM; "Public on the web". "Playlist-Media" = entity-TYPE label (this record IS an sw_playlist_media), NOT a count. Breadcrumb parent: "2. Joaninio teatras playlist".
+
+Findings:
+- "Joaninio" = OCR/typo for "Jaunimo". No sw_playlist named Joaninio; q=teatras returns ONLY 64f7f3034ecca5c17a5980d3 (LT Jaunimo teatras playlist) = SAME playlist already traced. Chain anchor CONFIRMED.
+- playlist_media in THIS playlist DO carry valid_from/valid_to/duration; both current children have duration=8 (matches CMS).
+- EXHAUSTIVE re-scan of all 158 playlist_media: ZERO reference banner media 6a2bfaad..., ZERO named naujas/sezonas, ZERO with valid_from on 2026-06-15. q=naujas sezonas on playlist_media = 0.
+- => The CMS-shown banner playlist-media EXISTED 2026-06-12 15:48 but is ABSENT from current (2026-06-18) API state. Fact, not mechanism.
+- Validity cross-check: sw_media valid_from 2026-06-15T07:00:48Z=10:00 EEST (CMS "10:00 AM"); sw_media valid_to 2026-09-01T12:26:11Z=15:26 EEST ~ CMS "03:27 PM" (verbatim, not theorized).
+- CORRECTION (team-lead 06-18): "Playlist-Media" is the entity-type label, NOT a sibling count. Do NOT infer extra siblings. Net fact stands: the banner sw_playlist_media (ord 1) existed at 06-12 15:48 and is absent now; the other 2 children survive. Mechanism UNKNOWN (no API audit trail).
+
+---
 
 ## 2026-06-02 RE-VERIFICATION — Bilietai S/G situation RESOLVED + API HOST CORRECTION
 

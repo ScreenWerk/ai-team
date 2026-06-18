@@ -1,6 +1,47 @@
 # Melies Scratchpad
 <!-- (*SW:Melies*) -->
 
+## Session: 2026-06-18 — Which player version do clients run? (version-ID task)
+
+### Repo lineage (FACT, from reading repos via gh, scratch clones now deleted)
+
+| Repo | What it actually is | Config/entry | Cache |
+|---|---|---|---|
+| Screenwerk-2014 (archived 2016) | **nwjs** desktop app. `code/player.js`, `entuPoll.js`. Screen id = local `*.uuid` FILE. README: "discontinued, get 2016". | file-based UUID, polls Entu directly | filesystem |
+| Screenwerk-2016 (pushed 2026-05-12 = dependabot/CVE only) | **Electron** app. `app/js/{sync,screenwerk,renderDom,globals,logging}.js`. Contains `sw2018.md`. VBS launchers, `screen.yml` SCREEN_EID. | `https://swpublisher.entu.eu/screen/{eid}.json` | filesystem `local/sw-media/` |
+| Screenwerk-2018 (= our legacy/ submodule, name `sw-2018`) | **Electron**, BYTE-IDENTICAL sync.js to 2016 except 2016 adds NODE_TLS_REJECT_UNAUTHORIZED=0. Same lineage. | same `swpublisher.entu.eu/screen/{eid}.json` | filesystem |
+| Screenwerk-2025 (first commit 2024-10-15, last 2026-05-12) | **Browser web player** (vanilla JS, nginx.conf, Dockerfile, service-worker.js, Docker swarm). `player/`, `dashboard/`. | `files.screenwerk.ee/screen/{id}.json`; live host detect = `screenwerk.ee` | service-worker CACHE_NAME (stale-while-revalidate) + localStorage config |
+| 2026 (= player/ submodule) | Nuxt 4 PWA. The "new (2026) version" Tomas had NOT heard of as of 2026-04-01. | files.screenwerk.ee | Workbox PWA |
+
+### URL discriminator → version (KEY FINDING, FACT)
+Both observed web-player URL formats belong to **Screenwerk-2025**, NOT to 2014/2016/2018 (those have NO browser URL routing; their "screen_id" hits are internal vars / local uuid files):
+- `?screen_id=<id>`  — original entry. Commit `bfb29e7` "accept creen id in url" (**2024-12-30**) added `URLSearchParams.get('screen_id')` to index.html. Matches client sighting 2025-02. Dashboard still links `/?screen_id=` (`dashboard/js/ui.js:36`).
+- `/player/#<id>`    — hash router added later. Commit `853ea8e` "feat: add player router" (**2026-04-02**); player/index.html:127 documents "Production usage: player/#your_screen_id", reads `window.location.hash`. Matches client sighting 2025-08 (hash entry existed earlier in player/index.html before the dedicated router commit).
+
+So `screenwerk.entu.ee` web player = Screenwerk-2025. The Electron apps fetch from `swpublisher.entu.eu` (.eu) — a different host, never a browser URL the client would paste.
+
+### Box-office devices (BP_Rimi_*) — web vs installed
+- Box-office Rimi boxes that PERSIST cached deleted/expired banners + reached via Anydesk = **installed Electron app**. Filesystem `local/sw-media/` cache persists across restarts and survives data deletion; 2016 README is literally the Windows box install guide (git clone + npm + screenwerk.vbs + screen.yml). This matches "device-side persistence."
+- The web player (2025) caches too (service-worker + localStorage) but is a browser pointed at a URL — that's the screen-display case where pasting the URL rendered correctly.
+
+### CORROBORATION from email account (via Lumiere, 2026-06-18 20:30) — UPGRADES the installed-player inference to FACT
+1. **Installed player = Screenwerk-2016 (CONFIRMED, no longer 2016/18-ambiguous).** 2022-01-17 Mihkel→Piletilevi install guide points to `github.com/ScreenWerk/Screenwerk-2016#readme`. Clients were told to install 2016. (2018 is the same codebase but NOT the deployed one.)
+2. Self-update = pre-start `git pull` before every launch (2023-03-05; offline launch broke when pull failed). Matches `prestart: git pull` in 2016/2018 package.json.
+3. Hardware: Linux Mint on Intel NUCs (EE) + Windows boxes (LV/LT). White-screen-on-media-add = Linux-Mint-specific.
+4. Web player: 2025-01-02 Mihkel calls `screenwerk.entu.ee/?screen_id=...` "the web-version BETA" = Screenwerk-2025. Confirms URL→repo mapping.
+5. Rewrite decision 2024-11-12: "new version will be browser-based" → 2025 web → 2026 Nuxt.
+
+### SESSION CLOSE (2026-06-18 ~21:07): version-ID task COMPLETE & recorded. No open threads. Next session: nothing pending on this; resume migration checklist/domain docs if asked.
+
+### Best assessment (FACT, after email corroboration)
+- Installed box-office player = **Screenwerk-2016** (email-confirmed install guide + git-pull self-update + filesystem-cache persistence symptom).
+- Web player at screenwerk.entu.ee = **Screenwerk-2025** (URL→commit chain + email "web BETA"). The 2026 Nuxt player is the not-yet-rolled-out successor.
+
+### Open / would-confirm (PO/ops actions)
+- Anydesk into a BP_Rimi box: check if it's Electron app (taskbar process / screenwerk.vbs / local/ folder) vs a browser kiosk → confirms installed-vs-web.
+- Captured deployed bundle from screenwerk.entu.ee (domain DOWN since ~Apr 2026) would confirm it was 2025 build — currently can't.
+- Ask which URL each client was given.
+
 ## Session: 2026-04-07 — Initial Codebase Exploration
 
 ### Legacy File Map
