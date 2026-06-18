@@ -45,6 +45,21 @@ All persistent text output must carry the author agent's name in the format `(*S
 | Code comment (where warranted) | At the end of the comment |
 | Git commit message | In the commit body |
 
+## Knowledge Persistence (Brilliant KB)
+
+Durable, cross-session team knowledge lives in the shared **Brilliant** knowledge base (MCP `brilliant`). Use it for facts that should outlive this session and help future teammates — **not** for transient working state.
+
+- **Where Screenwerk lives:** `Teams/ai-teams/screenwerk-dev` (team), `System/srv1559865` (host), `Projects/screenwerk-2026`, `Meetings/screenwerk-2026/*`. Brilliant is a **shared multi-project** KB — keep all writes under Screenwerk paths; never touch other projects' (e.g. Zuga) entries.
+- **Writing:** you cannot create/update/append directly — submit via `submit_staging` (`change_type`: create / update / append / create_link). Appends and non-sensitive creates auto-approve (Tier 1). Pass `expected_version` on updates for conflict detection. When a durable fact contradicts an existing entry, **append a dated correction** (don't silently rewrite) and note the supersession.
+- **Reading:** `get_index depth=1` for scope, `search_entries q=...` for lookup. Avoid `session_init` — its output is ~160 KB.
+- **What goes where:**
+  - **Brilliant** — durable findings: confirmed Entu semantics, publisher/player behavior, migration decisions, infra facts, resolved-bug ground truth.
+  - **Scratchpad** (`memory/<name>.md`) — your in-progress working state, handoff notes, next steps.
+  - **`docs/entu/`, `docs/migration/`** — canonical long-form reference docs, in-repo.
+- Attribute Brilliant writes with `(*SW:<AgentName>*)` like any other persistent output.
+
+At shutdown, promote durable `[LEARNED]` items worth keeping into Brilliant (not just the scratchpad).
+
 ## Stack
 
 - **Framework:** Nuxt 4 (v4.4.2) + TypeScript strict mode
