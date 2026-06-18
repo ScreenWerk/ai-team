@@ -268,7 +268,7 @@ ScreenWerk/ai-team/
 
 - **OS:** Debian (preferred) or Ubuntu
 - **Runtime:** Node.js 22.x
-- **Tools:** `gh` CLI, git, npm, tmux
+- **Tools:** `gh` CLI, git, npm (members spawn natively via the `Agent` tool — no terminal multiplexer required)
 - **Claude Code:** installed and configured with team roster
 - **Environment variables:**
   - `NUXT_PUBLIC_API_BASE=https://files.screenwerk.ee`
