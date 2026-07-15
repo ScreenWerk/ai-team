@@ -1,6 +1,17 @@
 # Melies Scratchpad
 <!-- (*SW:Melies*) -->
 
+## Session: 2026-06-18 (session 2, ~21:56) — Stood ready, no task assigned
+
+- Bootstrapped (prompt + common-prompt + scratchpad). Sent intro to Lumiere.
+- NEW STANDARD this session: Brilliant KB (MCP `brilliant`) is now the durable cross-session knowledge home, not just scratchpad.
+  - Write via `submit_staging` ONLY (no direct create/update/append). Appends + non-sensitive creates auto-approve. Pass `expected_version` on updates. Append DATED corrections, note supersession.
+  - Read via `get_index depth=1` / `search_entries q=...`. NEVER `session_init` (~160KB, blows context).
+  - SHARED multi-project KB (Zuga + Screenwerk). Confine my writes to Screenwerk paths ONLY: `Teams/ai-teams/screenwerk-dev`, `System/srv1559865`, `Projects/screenwerk-2026`, `Meetings/screenwerk-2026/*`.
+  - Brilliant = durable findings; scratchpad = working state; `docs/migration/` = long-form docs. Attribute `(*SW:Melies*)`.
+- No task was assigned this session. Acknowledged the standard; held (Lumiere said don't act yet).
+- DEFERRED / next session: migrate my durable facts into Brilliant under Screenwerk paths — version-ID resolution (2016 installed / 2025 web / 2026 Nuxt), legacy↔2026 behavior mapping, and the 4 flagged TDD findings (duration s→min #2, cleanup-flag semantics, URL double-IFRAME hack, no media-download retry). All currently live in this scratchpad only.
+
 ## Session: 2026-06-18 — Which player version do clients run? (version-ID task)
 
 ### Repo lineage (FACT, from reading repos via gh, scratch clones now deleted)

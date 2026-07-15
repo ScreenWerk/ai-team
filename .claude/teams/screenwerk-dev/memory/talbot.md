@@ -1,5 +1,14 @@
 # Talbot Scratchpad — updated 2026-06-18
 
+## SESSION CLOSE 2026-06-18 (session 3) — Brilliant promotion done
+Only task this session: promoted my durable Entu facts to Brilliant. DONE + auto-approved. No code touched, no open investigations beyond the already-parked #9. Next session: when correcting any fact in the Brilliant entry below, use submit_staging change_type=append with expected_version (don't rewrite); note supersession with a date. Issue #9 still parked on Tomas (back 2026-06-23) — mechanism of the missing playlist_media remains unknown (no Entu API audit trail); PO (Mihkel) owns the Tomas question.
+
+## BRILLIANT KB (durable findings promoted 2026-06-18)
+Entry: `Projects/screenwerk-2026/entu-platform-reference` (id `41ba791c-4d5c-4e7e-affe-635b801f9437`), content_type=resource, auto-approved (Tier 1).
+Holds: Entu API host (api.entu.app), publisher validity-source (sw_media not sw_playlist_media) + strips past-validTo at publish + player runtime filter, .eu/.ee byte-identical endpoints, blocked-publish heuristic, Issue #9 ground truth, Bilietai S/G RESOLVED (supersedes 04-08 block), DELETE-entity safety.
+Convention: APPEND DATED corrections to that entry via submit_staging (change_type=append, expected_version), note supersession, never rewrite. This scratchpad = working state; docs/entu/ = long-form.
+Related existing entries: Projects/screenwerk-2026 (9ffe58f9...), System/digitalocean-entu (2cf03576...).
+
 ## SESSION CLOSE 2026-06-18 (Issue #9 parked on Tomas, back 2026-06-23)
 Issue #9 investigated to ground truth. Net: banner sw_media 6a2bfaad4cd971291c5d53c2 is correctly future-dated (valid_from 2026-06-15T07:00:48Z = 10:00 EEST), is NOW orphaned (no playlist-media anywhere; existed at CMS capture 06-12 15:48, gone by 06-18), and is ABSENT from BOTH publisher endpoints (.eu swpublisher + .ee CDN are byte-identical, md5 c4a263bfa30d1e897db76fc195b3f9b0, only published version 06-12 12:56). No demonstrated pipeline/player bug. Chain: media -> (orphan) -> playlist 64f7f3034ecca5c17a5980d3 -> lp 64f7f35d... -> layout 64f7f220... -> schedule 64f7f25a... -> config 64f7f117... -> S/G 64f7f018... -> screen 64f7f3f04ecca5c17a5980d6 (BLT_Jaunimo_teatras, the only screen). Remaining unknowns are device-side + Tomas's exact observation (live vs CMS preview) — PO question owned by Mihkel, Tomas back 2026-06-23.
 
